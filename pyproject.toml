@@ -59,7 +59,6 @@ exclude = [
     "dist",
     "__pycache__",
     "tests/__init__.py",
-    "src/sr_sw_dev/logger.ini",
 ]
 
 [tool.ruff.lint]
