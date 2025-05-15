@@ -1,0 +1,40 @@
+# SCM syntax highlighting & preventing 3-way merges
+pixi.lock merge=binary linguist-language=YAML linguist-generated=true
+
+# Python files
+*.py linguist-language=Python
+*.pyw linguist-language=Python
+*.pyi linguist-language=Python
+*.pyx linguist-language=Python
+*.pxd linguist-language=Python
+*.pxi linguist-language=Python
+
+# Documentation
+*.md linguist-language=Markdown
+*.txt linguist-language=Text
+
+# Configuration files
+*.toml linguist-language=TOML
+*.yaml linguist-language=YAML
+*.yml linguist-language=YAML
+*.json linguist-language=JSON
+*.ini linguist-language=INI
+
+# Test files
+tests/* linguist-language=Python
+tests/**/* linguist-language=Python
+
+# Source files
+src/* linguist-language=Python
+src/**/* linguist-language=Python
+
+# Prevent line ending issues
+* text=auto
+*.py text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.toml text eol=lf
+*.ini text eol=lf

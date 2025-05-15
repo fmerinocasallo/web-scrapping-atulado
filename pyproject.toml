@@ -1,0 +1,47 @@
+[project]
+name = "web-scrapping"
+dynamic = ["version"]
+authors = [
+    {name = "Francisco Merino-Casallo", email = "francisco.merinocasallo@gmail.com"}
+]
+dependencies = []
+requires-python = ">= 3.11"
+description = "A package to parse the current electricity rates."
+readme = "README.md"
+keywords = ["monitoring", "web-scrapping", "electricity"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: Other Audience",
+    "Topic :: Utilities",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
+
+[tool.pixi.project]
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+
+[tool.pixi.pypi-dependencies]
+web-scrapping = { path = ".", editable = true }
+
+[tool.pixi.tasks]
+
+[tool.pixi.dependencies]
+beautifulsoup4 = ">=4.13.4,<5"
+python = ">=3.13.3,<3.14"
+requests = ">=2.32.3,<3"
+selenium = ">=4.32.0,<5"
+webdriver-manager = ">=4.0.2,<5"
+pytest = ">=8.3.5,<9"
+pytest-cov = ">=6.1.1,<7"
+pip = ">=25.1.1,<26"
+
+[tool.hatch.version]
+path = "src/web_scrapping/__init__.py"
