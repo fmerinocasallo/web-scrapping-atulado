@@ -53,6 +53,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/python_abi-3.13-7_cp313.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/readline-8.2-h8c095d6_2.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/requests-2.32.3-pyhd8ed1ab_1.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/ruff-0.11.9-py313h22842b3_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/selenium-4.32.0-pyhe01879c_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/selenium-manager-4.32.0-hb23c6cf_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/sniffio-1.3.1-pyhd8ed1ab_1.conda
@@ -640,6 +641,23 @@ packages:
   - pkg:pypi/requests?source=hash-mapping
   size: 58723
   timestamp: 1733217126197
+- conda: https://conda.anaconda.org/conda-forge/linux-64/ruff-0.11.9-py313h22842b3_0.conda
+  sha256: b560f202f5940857b7a25e708a1734522de59bb024011e45408242bfcd21a22f
+  md5: 3dc9b639c9a5915d48dd69161f6c8a49
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  - libgcc >=13
+  - libstdcxx >=13
+  - python >=3.13,<3.14.0a0
+  - python_abi 3.13.* *_cp313
+  constrains:
+  - __glibc >=2.17
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/ruff?source=hash-mapping
+  size: 9211172
+  timestamp: 1746841218728
 - conda: https://conda.anaconda.org/conda-forge/noarch/selenium-4.32.0-pyhe01879c_0.conda
   sha256: 5e5c3908846eb12982bc441309d6f1e1e3ccf03d6d03c5e603b5e4440dfd53cf
   md5: 8f84e44404e6e1af7b4315024b562372
@@ -829,8 +847,8 @@ packages:
 - pypi: .
   name: web-scrapping
   version: 0.0.1
-  sha256: 9886930cfd859db163271f32d8c8d0c5e978247439538c17f251bbfb101bd0fa
-  requires_python: '>=3.11'
+  sha256: b68017146107e86a616170dedb5f88afcb7931f7dd0f960c65d2b3a54df46bbb
+  requires_python: '>=3.13'
   editable: true
 - conda: https://conda.anaconda.org/conda-forge/noarch/webdriver-manager-4.0.2-pyhd8ed1ab_1.conda
   sha256: 644030e6eede21a685553cfdc111fef3f6fcb1f3c1b170adac86dc3acd76f2b1

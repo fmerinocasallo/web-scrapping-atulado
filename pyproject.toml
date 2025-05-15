@@ -5,7 +5,7 @@ authors = [
     {name = "Francisco Merino-Casallo", email = "francisco.merinocasallo@gmail.com"}
 ]
 dependencies = []
-requires-python = ">= 3.11"
+requires-python = ">= 3.13"
 description = "A package to parse the current electricity rates."
 readme = "README.md"
 keywords = ["monitoring", "web-scrapping", "electricity"]
@@ -14,7 +14,7 @@ classifiers = [
     "Intended Audience :: Information Technology",
     "Intended Audience :: Other Audience",
     "Topic :: Utilities",
-    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.13",
     "Operating System :: OS Independent",
 ]
 license = "MIT"
@@ -31,8 +31,6 @@ platforms = ["linux-64"]
 [tool.pixi.pypi-dependencies]
 web-scrapping = { path = ".", editable = true }
 
-[tool.pixi.tasks]
-
 [tool.pixi.dependencies]
 beautifulsoup4 = ">=4.13.4,<5"
 python = ">=3.13.3,<3.14"
@@ -42,6 +40,63 @@ webdriver-manager = ">=4.0.2,<5"
 pytest = ">=8.3.5,<9"
 pytest-cov = ">=6.1.1,<7"
 pip = ">=25.1.1,<26"
+ruff = ">=0.11.9,<0.12"
 
 [tool.hatch.version]
 path = "src/web_scrapping/__init__.py"
+
+[tool.pixi.tasks]
+test = "pytest"
+
+[tool.ruff]
+target-version = "py313"
+line-length = 88
+exclude = [
+    ".git",
+    ".ruff_cache",
+    ".venv",
+    "build",
+    "dist",
+    "__pycache__",
+    "tests/__init__.py",
+    "src/sr_sw_dev/logger.ini",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",     # pycodestyle (style errors)
+    "F",     # pyflakes (code correctness)
+    "I",     # isort (import sorting)
+    "UP",    # pyupgrade (modern syntax)
+    "B",     # flake8-bugbear (common bugs and design issues)
+    "C4",    # flake8-comprehensions (comprehension optimizations)
+    "SIM",   # flake8-simplify (simpler constructs)
+    "TID",   # flake8-tidy-imports (import hygiene)
+    "RUF",   # Ruff-native rules
+    "ANN",   # flake8-annotations (type hints)
+    "TCH",   # Ruff's type-checking helpers
+    "D",     # pydocstyle (docstring quality)
+    "S",     # bandit (security checks)
+]
+ignore = [
+    "D212",     # Multi-line summary first line
+    "E501",     # Line too long (Black handles this)
+    "B008",     # Function call in argument defaults (sometimes too strict)
+]
+dummy-variable-rgx = "^_"
+
+[tool.ruff.lint.flake8-annotations]
+suppress-none-returning = true
+suppress-dummy-args = true
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*.py" = ["S101"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
