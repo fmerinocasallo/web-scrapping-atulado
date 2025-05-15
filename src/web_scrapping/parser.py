@@ -18,6 +18,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from unidecode import unidecode
 from webdriver_manager.chrome import ChromeDriverManager
 
 from src.web_scrapping import paths
@@ -207,7 +208,7 @@ def main(plan: str = "milenial"):
     parsed_rates = parse_rates(html, plan)
 
     with open(
-        paths.data_dir / f"{plan.replace(' ', '-')}_rates.json",
+        paths.data_dir / f"{unidecode(plan).replace(' ', '-')}_rates.json",
         "w",
         encoding="utf-8",
     ) as f:
