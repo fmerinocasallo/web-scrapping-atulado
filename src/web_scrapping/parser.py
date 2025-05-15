@@ -4,10 +4,75 @@ Parser for current electricity rates from A tu Lado Energía.
 Provides tools to extract consumption and power prices from the company's website.
 """
 
+import json
 import re
+import sys
 from typing import Literal
 
+import typer
 from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from webdriver_manager.chrome import ChromeDriverManager
+
+from src.web_scrapping import paths
+
+
+def get_html() -> str:
+    """
+    Load the online version of the A tu Lado Energía website.
+
+    Returns:
+        str: The HTML content of the A tu Lado Energía website.
+    """
+    URL = "https://clientes.atuladoenergia.com/tarifas"
+
+    # Setup Chrome options
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-gpu")
+
+    # Initialize WebDriver
+    # This will automatically download and manage ChromeDriver
+    service = Service(ChromeDriverManager().install())
+    # Create a new Chrome browser instance, with the options we've set up
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+
+    # Get the page
+    driver.get(URL)
+
+    try:
+        WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located(
+                (
+                    By.XPATH,
+                    "//p[contains(translate(., 'milenial', 'MILENIAL'), 'MILENIAL')]",
+                )
+            )
+        )
+    except TimeoutException:
+        print(
+            "ERROR: Could not find any reference to the 'Milenial' plan "
+            "in the online version of the A tu Lado Energía website "
+            "after 15 seconds. The website may have changed "
+            "or there is a connection problem."
+        )
+        driver.quit()
+        sys.exit(1)
+
+    # Get the page source after JavaScript rendering
+    html = driver.page_source
+
+    # Close the browser (it's no longer needed, and frees up resources)
+    driver.quit()
+
+    return html
 
 
 def _extract_value_unit(text: str) -> tuple[float, str]:
@@ -127,3 +192,27 @@ def parse_rates(html: str, plan: str) -> dict:
                 "consumption": _parse_section_rates("consumo", rates),
                 "power": _parse_section_rates("potencia", rates),
             }
+
+
+def main(plan: str = "milenial"):
+    """
+    Parse the electricity rates for the given plan from the HTML.
+
+    Args:
+        plan (str, optional): The plan name to search for (case-insensitive).
+            Defaults to "milenial".
+    """
+    html = get_html()
+
+    parsed_rates = parse_rates(html, plan)
+
+    with open(
+        paths.data_dir / f"{plan.replace(' ', '-')}_rates.json",
+        "w",
+        encoding="utf-8",
+    ) as f:
+        json.dump(parsed_rates, f, ensure_ascii=False, indent=4)
+
+
+if __name__ == "__main__":
+    typer.run(main)
