@@ -1,0 +1,42 @@
+name: Online Parser Monitor
+
+on:
+  schedule:
+    - cron: '0 14 5 * *'  # At 14:00 UTC on the 5th of every month
+  workflow_dispatch:      # Allow manual trigger
+
+jobs:
+  test-online:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install .
+
+      - name: Install Chrome and ChromeDriver
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Run online tests
+        run: pytest tests/test_parser_online.py
+
+      - name: Send email on failure
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "⚡️ Web Scrapping Parser Online Test Failed"
+          to: ${{ secrets.EMAIL_TO }}
+          from: Github Actions <${{ secrets.EMAIL_FROM }}>
+          body: |
+            The online parser test failed. Please check the logs at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
