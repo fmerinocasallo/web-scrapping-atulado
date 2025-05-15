@@ -10,7 +10,7 @@ a Spanish electricity company.
 3. [:toolbox: Solution](#solution)
 4. [:hammer: Installation](#install)
 5. [:white_check_mark: Testing](#tests)
-
+6. [:robot: Continuous Integration & Monitoring](#ci)
 <div id="problem"></div>
 
 ## :question: Problem
@@ -25,7 +25,8 @@ However, the company does not provide an API to access the current rates,
 which, I was told, may change at the 1st of every month without prior notice.
 
 Their alternatives (call them or check their website) were not appealing to me,
-so I decided to automate the process of checking their website to get the latest information.
+so I decided to automate the process of checking their website
+to get the latest information.
 
 <div id="goal"></div>
 
@@ -41,11 +42,13 @@ a Spanish electricity company, and export them as a JSON file.
 
 The source code of the proposed solution is located in [`src/web_scrapping/parser.py`](src/web_scrapping/parser.py).
 
-The proposed solution leverages [Typer](https://typer.tiangolo.com) to develop a CLI application
-so users can easly call the proposed parser from terminal.
+The proposed solution leverages [Typer](https://typer.tiangolo.com)
+to develop a CLI application so users can easly call the proposed parser from terminal.
 
-It also uses [Selenium](https://www.selenium.dev) to scrape the website of the electricity company
-and [BeautifulSoup](https://beautiful-soup-4.readthedocs.io/en/latest/) to parse the HTML content.
+It also uses [Selenium](https://www.selenium.dev)
+to scrape the website of the electricity company
+and [BeautifulSoup](https://beautiful-soup-4.readthedocs.io/en/latest/)
+to parse the HTML content.
 
 <div id="install"></div>
 
@@ -53,7 +56,9 @@ and [BeautifulSoup](https://beautiful-soup-4.readthedocs.io/en/latest/) to parse
 
 ### Recommended: Using Pixi
 
-[Pixi](https://prefix.dev/docs/pixi/) is a modern environment and package manager that ensures reproducibility and easy setup. To create and activate the development environment, run:
+[Pixi](https://prefix.dev/docs/pixi/) is a modern environment and package manager
+that ensures reproducibility and easy setup.
+To create and activate the development environment, run:
 
 ```bash
 pixi install
@@ -82,7 +87,9 @@ conda env create -f environment.yml
 conda activate web-scrapping
 ```
 
-> **Note:** The `requirements.txt` and `environment.yml` files are kept in sync with the main dependencies. If you add or update dependencies, please update these files accordingly.
+> **Note:** The `requirements.txt` and `environment.yml` files are kept in sync with
+the main dependencies. If you add or update dependencies,
+please update these files accordingly.
 
 ***
 
@@ -152,10 +159,46 @@ without even running them!
 
 #### :traffic_light: Test-Driven Development
 
-I have applied [**Test-Driven Development (TDD)**](https://en.wikipedia.org/wiki/Test-driven_development) principles to this project.
+I have applied [**Test-Driven Development (TDD)**](https://en.wikipedia.org/wiki/Test-driven_development)
+principles to this project.
 This means that I have written the tests before the code.
 This is a great practice because it forces you to think about the requirements
 and the expected behavior of the code before you actually write it.
+
+<div id="ci"></div>
+
+## :robot: Continuous Integration & Monitoring
+This project uses [GitHub Actions](https://docs.github.com/en/actions)
+to ensure code quality and monitor the parser’s real-world performance:
+
+#### :white_check_mark: Continuous Integration (CI)
+
+**Workflow**: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
+
+**When**: On every push and pull request to the main branch.
+
+**What**: Runs the full offline test suite to ensure that no breaking changes
+are introduced before merging.
+
+**Why**: This guarantees that all code in main is stable
+and passes all tests using a static, reproducible copy of the website.
+
+#### :satellite: Online Parser Monitoring
+
+**Workflow**: [`.github/workflows/online-monitor.yml`](.github/workflows/online-monitor.yml)
+
+**When**: Automatically runs at 14:00 UTC on the 5th of every month
+(and can be triggered manually).
+
+**What**: Runs the online test suite against the live A tu Lado Energía website.
+
+**Why**: Detects if the website structure has changed and the parser
+is no longer working as expected or if the rates of the Milenial plan have changed.
+
+**Alert**: If the online tests fail, an email notification is sent to the maintainer.
+
+These workflows help ensure the parser remains robust and up-to-date,
+both in development and in production.
 
 <div id="license"></div>
 
