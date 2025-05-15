@@ -11,7 +11,8 @@ from bs4 import BeautifulSoup
 
 
 def _extract_value_unit(text: str) -> tuple[float, str]:
-    """Extract the value and unit from the text.
+    """
+    Extract the value and unit from the text.
 
     Args:
         text (str): The text to extract the value and unit from.
@@ -97,9 +98,12 @@ def parse_rates(html: str, plan: str) -> dict:
     Returns:
         dict: Nested dictionary with consumption and power rates by period.
     """
+    # Parse the HTML
     soup = BeautifulSoup(html, "html.parser")
     rates_grid = soup.find("div", class_="rates-grid")
     plan_card = None
+
+    # Find the plan card
     if rates_grid:
         for card in rates_grid.find_all("div", recursive=False):
             header = card.find("div", class_="card-header")
@@ -109,13 +113,16 @@ def parse_rates(html: str, plan: str) -> dict:
                     plan_card = card
                     break
 
+    # Check if the plan card was found
     if not plan_card:
         raise ValueError(f"Plan '{plan}' not found in the provided HTML.")
     else:
+        # Find the consumption and power rates
         rates = plan_card.find("div", class_="rates")
         if not rates:
             raise ValueError("Rates not found in the provided HTML.")
         else:
+            # Parse the consumption and power rates
             return {
                 "consumption": _parse_section_rates("consumo", rates),
                 "power": _parse_section_rates("potencia", rates),
