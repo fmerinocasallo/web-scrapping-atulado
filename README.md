@@ -4,6 +4,13 @@ This package contains a script to parse the current electricity rates
 from the website of [A tu Lado Energía (Hidroelectrica El Carmen Energía)](https://www.atuladoenergia.com),
 a Spanish electricity company.
 
+## Table of contents
+1. [:question: Problem](#problem)
+2. [:dart: Goal](#goal)
+3. [:toolbox: Solution](#solution)
+4. [:hammer: Installation](#install)
+5. [:white_check_mark: Testing](#tests)
+
 <div id="problem"></div>
 
 ## :question: Problem
@@ -39,6 +46,8 @@ so users can easly call the proposed parser from terminal.
 
 It also uses [Selenium](https://www.selenium.dev) to scrape the website of the electricity company
 and [BeautifulSoup](https://beautiful-soup-4.readthedocs.io/en/latest/) to parse the HTML content.
+
+<div id="install"></div>
 
 ## :hammer: Installation
 
@@ -101,6 +110,52 @@ python -m src.web_scrapping.parser --plan "milenial"
 
 It will create a JSON file [`milenial_rates.json`](data/milenial_rates.json)
 in the [`data`](data) directory with the rates for the `milenial` plan.
+
+<div id="tests"></div>
+
+## :white_check_mark: Testing
+
+Writing tests for your code is a great practice.
+Tests helps you not only identify and resolve issues early but also debug your code faster.
+As a result, tests boost your productivity and promote more robust software.
+If you depend on a chunk of code, you should write tests for it.
+
+During software development, you may inadvertently alter
+an existing chunk of code on which your project depends.
+This change may break other functions or workflows
+that rely on that code snippet.
+Writing tests that get automatically executed automatically and continuously
+will help you catch these changes before you merge them into your codebase.
+
+I opted to use [pytest](https://docs.pytest.org/en/stable/) to write some tests
+to ensure that my social networking application behaves as expected.
+`pytest` makes it easy to write small and readable tests,
+and is also well-equipped to grow in complexity if needed.
+
+See `tests/` for more details about the written tests.
+
+To automatically run all the tests included in this project,
+execute the following shell command from the main directory:
+```
+pytest tests
+```
+
+You may want to get more details about the test coverage
+by running the following shell command:
+```
+pytest tests --cov=src.sr_sw_dev --cov-report=term-missing
+```
+
+Note that other tools such as [mypy](https://www.mypy-lang.org/index.html)
+(a static type checker) could also help you identify bugs in your programs
+without even running them!
+
+#### :traffic_light: Test-Driven Development
+
+I have applied [**Test-Driven Development (TDD)**](https://en.wikipedia.org/wiki/Test-driven_development) principles to this project.
+This means that I have written the tests before the code.
+This is a great practice because it forces you to think about the requirements
+and the expected behavior of the code before you actually write it.
 
 <div id="license"></div>
 
