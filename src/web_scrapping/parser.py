@@ -4,13 +4,13 @@ Parser for current electricity rates from A tu Lado Energía.
 Provides tools to extract consumption and power prices from the company's website.
 """
 
-import json
 import re
 import sys
 from typing import Literal
 
 import typer
 from bs4 import BeautifulSoup
+from pydantic import BaseModel, Field, field_validator
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.chrome.options import Options
@@ -22,6 +22,51 @@ from unidecode import unidecode
 from webdriver_manager.chrome import ChromeDriverManager
 
 from src.web_scrapping import paths
+
+
+class ConsumptionRates(BaseModel):
+    """Model for consumption rates."""
+
+    peak: tuple[float, str] = Field(description="Peak rate (value, unit)")
+    flat: tuple[float, str] = Field(description="Flat rate (value, unit)")
+    valley: tuple[float, str] = Field(description="Valley rate (value, unit)")
+
+    @field_validator("peak", "flat", "valley")
+    @classmethod
+    def validate_period(cls, v: tuple[float, str]) -> tuple[float, str]:
+        """Validate that consumption rates use €/kWh and have positive values."""
+        value, unit = v
+        if value <= 0:
+            raise ValueError("Consumption rate values must be positive")
+        if unit != "€/kWh":
+            raise ValueError("Consumption rate units must be €/kWh")
+        return v
+
+
+class PowerRates(BaseModel):
+    """Model for power rates."""
+
+    peak: tuple[float, str] = Field(description="Peak rate (value, unit)")
+    flat: tuple[float, str] = Field(description="Flat rate (value, unit)")
+    valley: tuple[float, str] = Field(description="Valley rate (value, unit)")
+
+    @field_validator("peak", "flat", "valley")
+    @classmethod
+    def validate_period(cls, v: tuple[float, str]) -> tuple[float, str]:
+        """Validate that power rates use €/kW day and have positive values."""
+        value, unit = v
+        if value <= 0:
+            raise ValueError("Power rate values must be positive")
+        if unit != "€/kW day":
+            raise ValueError("Power rate units must be €/kW day")
+        return v
+
+
+class ElectricityRates(BaseModel):
+    """Model for electricity rates."""
+
+    consumption: ConsumptionRates
+    power: PowerRates
 
 
 def get_html() -> str:
@@ -153,7 +198,7 @@ def _parse_section_rates(
         return result
 
 
-def parse_rates(html: str, plan: str) -> dict:
+def parse_rates(html: str, plan: str) -> ElectricityRates:
     """
     Parse the electricity rates for the given plan from the HTML.
 
@@ -162,7 +207,10 @@ def parse_rates(html: str, plan: str) -> dict:
         plan (str): The plan name to search for (case-insensitive).
 
     Returns:
-        dict: Nested dictionary with consumption and power rates by period.
+        ElectricityRates: Validated electricity rates.
+
+    Raises:
+        ValueError: If the plan or rates are not found in the HTML.
     """
     # Parse the HTML
     soup = BeautifulSoup(html, "html.parser")
@@ -189,10 +237,22 @@ def parse_rates(html: str, plan: str) -> dict:
             raise ValueError("Rates not found in the provided HTML.")
         else:
             # Parse the consumption and power rates
-            return {
-                "consumption": _parse_section_rates("consumo", rates),
-                "power": _parse_section_rates("potencia", rates),
-            }
+            consumption_rates = _parse_section_rates("consumo", rates)
+            power_rates = _parse_section_rates("potencia", rates)
+
+            # Convert to Pydantic models
+            return ElectricityRates(
+                consumption=ConsumptionRates(
+                    peak=consumption_rates["peak"],
+                    flat=consumption_rates["flat"],
+                    valley=consumption_rates["valley"],
+                ),
+                power=PowerRates(
+                    peak=power_rates["peak"],
+                    flat=power_rates["flat"],
+                    valley=power_rates["valley"],
+                ),
+            )
 
 
 def main(plan: str = "milenial"):
@@ -212,7 +272,7 @@ def main(plan: str = "milenial"):
         "w",
         encoding="utf-8",
     ) as f:
-        json.dump(parsed_rates, f, ensure_ascii=False, indent=4)
+        f.write(parsed_rates.model_dump_json(indent=4, ensure_ascii=False))
 
 
 if __name__ == "__main__":

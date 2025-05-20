@@ -42,7 +42,7 @@ def test_consumption_rates_invalid_unit():
     }
     with pytest.raises(ValidationError) as exc_info:
         ConsumptionRates(**invalid_data)
-    assert "Consumption rates units must be €/kWh" in str(exc_info.value)
+    assert "Consumption rate units must be €/kWh" in str(exc_info.value)
 
 
 def test_power_rates_valid_data():
@@ -65,7 +65,7 @@ def test_power_rates_invalid_value():
     }
     with pytest.raises(ValidationError) as exc_info:
         PowerRates(**invalid_data)
-    assert "Rate value must be positive" in str(exc_info.value)
+    assert "Power rate values must be positive" in str(exc_info.value)
 
 
 def test_power_rates_invalid_unit():
@@ -77,7 +77,7 @@ def test_power_rates_invalid_unit():
     }
     with pytest.raises(ValidationError) as exc_info:
         PowerRates(**invalid_data)
-    assert "Power rates must use €/kW day" in str(exc_info.value)
+    assert "Power rate units must be €/kW day" in str(exc_info.value)
 
 
 def test_electricity_rates_valid_data():

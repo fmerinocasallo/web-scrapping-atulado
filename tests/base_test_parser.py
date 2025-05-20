@@ -157,4 +157,4 @@ class BaseTestParser:
         }
         result = parser.parse_rates(html, "milenial")
         print(f"result: {result}")
-        assert result == expected
+        assert result.model_dump() == expected
