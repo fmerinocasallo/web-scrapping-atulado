@@ -165,11 +165,54 @@ This means that I have written the tests before the code.
 This is a great practice because it forces you to think about the requirements
 and the expected behavior of the code before you actually write it.
 
+#### Data validation
+
+Software tests check that the functions that you write behave correctly.
+Conversely, data validation ensures that the input data to your functions
+satisfy the assumptions from the data processing functions you write.
+
+You should automatically and continuously run tests to check your code.
+Likewise, you should constantly ensure the input data from your functions
+meet the assumptions you possess about them.
+
+This project uses [Pydantic](https://docs.pydantic.dev/latest/) for data validation
+because we are validating structured data from a web scraping process,
+which is similar to validating user input from an API or form.
+Pydantic is particularly well-suited for this use case as it:
+- Provides clear validation error messages
+- Integrates well with Python's type hints
+- Has excellent performance for structured data validation
+- Is widely used in the Python ecosystem
+
+The following validation rules are enforced:
+
+- Consumption rates:
+  - Must use €/kWh as the unit
+  - Must have positive values
+  - Must include peak, flat, and valley periods
+
+- Power rates:
+  - Must use €/kW day as the unit
+  - Must have positive values
+  - Must include peak, flat, and valley periods
+
+- Electricity rates:
+  - Must include both consumption and power rates
+  - All rates must be valid according to the rules above
+
+These validation rules are implemented using Pydantic models in `src/web_scrapping/parser.py`
+and tested in `tests/test_parser_validation.py`.
+
+For other validation use cases, consider these alternatives:
+- [Pandera](https://union.ai/pandera): Best for validating dataframes or databases in mixed teams
+- [Great Expectations](https://greatexpectations.io): Ideal for production environments with automated workflows
+- [Pointblank](https://rich-iannone.github.io/pointblank/): A promising new tool for data validation
+
 <div id="ci"></div>
 
 ## :robot: Continuous Integration & Monitoring
 This project uses [GitHub Actions](https://docs.github.com/en/actions)
-to ensure code quality and monitor the parser’s real-world performance:
+to ensure code quality and monitor the parser's real-world performance:
 
 #### :white_check_mark: Continuous Integration (CI)
 
