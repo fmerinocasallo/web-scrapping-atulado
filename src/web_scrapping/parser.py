@@ -23,6 +23,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 from src.web_scrapping import paths
 
+app = typer.Typer()
+
 
 class ConsumptionRates(BaseModel):
     """Model for consumption rates."""
@@ -102,15 +104,16 @@ def get_html() -> str:
                 )
             )
         )
-    except TimeoutException:
+    except TimeoutException as e:
         print(
             "ERROR: Could not find any reference to the 'Milenial' plan "
             "in the online version of the A tu Lado Energía website "
             "after 15 seconds. The website may have changed "
-            "or there is a connection problem."
+            "or there is a connection problem.",
+            file=sys.stderr,
         )
         driver.quit()
-        sys.exit(1)
+        raise typer.Exit(1) from e
 
     # Get the page source after JavaScript rendering
     html = driver.page_source
@@ -255,7 +258,8 @@ def parse_rates(html: str, plan: str) -> ElectricityRates:
             )
 
 
-def main(plan: str = "milenial"):
+@app.command()
+def main(plan: str = "milenial") -> None:
     """
     Parse the electricity rates for the given plan from the HTML.
 
@@ -263,17 +267,20 @@ def main(plan: str = "milenial"):
         plan (str, optional): The plan name to search for (case-insensitive).
             Defaults to "milenial".
     """
-    html = get_html()
+    try:
+        html = get_html()
+        parsed_rates = parse_rates(html, plan)
 
-    parsed_rates = parse_rates(html, plan)
-
-    with open(
-        paths.data_dir / f"{unidecode(plan).replace(' ', '-')}_rates.json",
-        "w",
-        encoding="utf-8",
-    ) as f:
-        f.write(parsed_rates.model_dump_json(indent=4, ensure_ascii=False))
+        with open(
+            paths.data_dir / f"{unidecode(plan).replace(' ', '-')}_rates.json",
+            "w",
+            encoding="utf-8",
+        ) as f:
+            f.write(parsed_rates.model_dump_json(indent=4))
+    except (ValueError, PermissionError) as e:
+        print(str(e), file=sys.stderr)
+        raise typer.Exit(1) from e
 
 
 if __name__ == "__main__":
-    typer.run(main)
+    app()
